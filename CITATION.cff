@@ -1,0 +1,75 @@
+cff-version: 1.2.0
+message: "If you use this formalization, cite this software and the relevant original mathematical sources."
+title: "HeavyTailedNoise: Lean 4 formalization of stochastic optimization bounds"
+type: software
+authors:
+  - family-names: "Xiong"
+    given-names: "Zhixiao"
+repository-code: "https://github.com/xiong-zx/heavy-tailed-noise-lean"
+version: "0.1.0"
+license: MIT
+abstract: >-
+  Lean 4 formalization of the complete finite-q lower bound for arbitrary
+  randomized strict-K=1 algorithms, including the Bernoulli-chain baseline
+  and gated Haar term,
+  for stochastic optimization with bounded p-th central moments and
+  global same-seed q-increment bounds, and the first-slot-normalized
+  Fradin v2 Theorem 3.1 on the original response-only zero-respecting
+  shared-seed batch protocol. The library also contains reusable model,
+  analysis, probability, and upper-bound foundations. The integrated
+  218-module canonical native build, full provenance audit, 18-entry
+  public signature and axiom audit, and standalone full-entry import
+  check passed locally on 27 September 2026. The complete lower bound
+  retains an absolute relative accuracy condition and fixed natural
+  response budgets; no complete upper-rate or infinite-q theorem is claimed.
+keywords:
+  - "Lean 4"
+  - "stochastic optimization"
+  - "heavy-tailed noise"
+  - "complexity lower bounds"
+  - "formal verification"
+references:
+  - type: article
+    title: "Lower Bounds for Finding Stationary Points I"
+    authors:
+      - family-names: Carmon
+        given-names: Yair
+      - family-names: Duchi
+        given-names: "John C."
+      - family-names: Hinder
+        given-names: Oliver
+      - family-names: Sidford
+        given-names: Aaron
+    year: 2017
+    url: "https://arxiv.org/abs/1710.11606"
+  - type: article
+    title: "Lower Bounds for Non-Convex Stochastic Optimization"
+    authors:
+      - family-names: Arjevani
+        given-names: Yossi
+      - family-names: Carmon
+        given-names: Yair
+      - family-names: Duchi
+        given-names: "John C."
+      - family-names: Foster
+        given-names: "Dylan J."
+      - family-names: Srebro
+        given-names: Nathan
+      - family-names: Woodworth
+        given-names: Blake
+    year: 2019
+    url: "https://arxiv.org/abs/1912.02365"
+  - type: article
+    title: "Tight Lower Bounds and Optimal Algorithms for Stochastic Nonconvex Optimization with Heavy-Tailed Noise"
+    authors:
+      - family-names: Fradin
+        given-names: Adrien
+      - family-names: Sadiev
+        given-names: Abdurakhmon
+      - family-names: Condat
+        given-names: Laurent
+      - family-names: Richtárik
+        given-names: Peter
+    year: 2026
+    version: "arXiv v2"
+    url: "https://arxiv.org/abs/2512.18713v2"

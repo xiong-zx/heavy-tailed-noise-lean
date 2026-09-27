@@ -1,0 +1,12 @@
+name = "heavy_tailed_noise"
+version = "0.1.0"
+defaultTargets = ["HeavyTailedNoise"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "5ed2965256430c3649e86755f9576b54eca72435"
+
+[[lean_lib]]
+name = "HeavyTailedNoise"
+globs = ["HeavyTailedNoise", "HeavyTailedNoise.+"]
