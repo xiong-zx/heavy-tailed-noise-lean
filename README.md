@@ -2,7 +2,60 @@
 
 [![Lean CI](https://github.com/xiong-zx/heavy-tailed-noise-lean/actions/workflows/lean.yml/badge.svg)](https://github.com/xiong-zx/heavy-tailed-noise-lean/actions/workflows/lean.yml)
 
-A Lean 4 library for stochastic optimization under heavy-tailed oracle noise. Its main release target is the complete finite-q lower bound for arbitrary randomized strict-K=1 algorithms. The model, reusable analysis and probability, and individual constructions remain separate.
+A Lean 4 library for stochastic optimization under heavy-tailed oracle noise. Version 0.1.0 established the complete finite-q lower bound for arbitrary randomized strict-K=1 algorithms. Version 0.2.0 adds the original shared-batch EMA upper theorem and same-model matching corollaries. The model, reusable analysis and probability, and individual constructions remain separate.
+
+## Original strict-K=1 upper theorem and matching rate
+
+For the same admissible gradient-only oracle class, every `1<p≤2`, finite
+real `q≥1`, and `σ≥0`, the original shared-batch exponential-memory method
+has expected gradient norm at most ε and a deterministic response cap
+
+\[
+N \le C_{p,q}\left[S^r+A_+\max\{S^2,S^{r/q}\}\right],
+\qquad A_+=\max(1,L\Delta/\epsilon^2),\quad S=\max(1,\sigma/\epsilon).
+\]
+
+Here `r=p/(p−1)` and `C(p,q)>0` depends only on p,q. The exact count is
+`1 + (if q>1 and J>0 then n_I else 0) + T*n`. Each fresh seed returns one
+gradient at one point. Every response feeds all scales of the same batch;
+the proof retains their correlations and conditions before the whole batch.
+The independent random output needs no additional response. The theorem's
+inputs are an original `Admissible` instance and positive ε; tracker,
+residual, variance, bias and estimator-error bounds are proved internally.
+No oracle second moment or independence between scales is assumed.
+
+In the common accuracy regime `A=LΔ/ε²≥10,752,000`, set
+`B=(σ/ε)^r` and `M=max(A+B+A B^(1/q), A S²)`. The literal same minimax
+quantity satisfies
+
+\[
+c_{p,q}M < N_\epsilon \le 2 C_{p,q}M.
+\]
+
+Both coefficients are positive. The two rate shapes satisfy `U≤2M` and
+`M≤2U`, where U is the displayed upper shape. The lower side imports the
+complete unrestricted `Lower.Full` theorem, not a zero-respecting result.
+The model permits full history, arbitrary measurable private randomness,
+remote queries and an unqueried output; the response budget is fixed.
+
+```lean
+import HeavyTailedNoise.Upper.Full
+import HeavyTailedNoise.TightRate
+
+#check HeavyTailedNoise.UpperK1.Admissible.strict_k1_shared_batch_ema_upper
+#check HeavyTailedNoise.UpperK1.strict_k1_shared_batch_ema_uniform_guarantee
+#check HeavyTailedNoise.strictK1_same_model_minimax_tight_rate
+#check HeavyTailedNoise.strictK1_same_model_tight_rate
+```
+
+The upper, uniform guarantee and matching modules passed canonical native
+compilation. A separate public-entry import/type/axiom check exited 0. The
+full recursive **421-module canonical build and 30-entry guarded public audit
+also exited 0 on 30 September 2026**. Every guarded declaration uses exactly
+`propext`, `Classical.choice` and `Quot.sound`; no proof placeholder or extra
+project axiom occurs in their transitive dependencies. The [GitHub workflow](.github/workflows/lean.yml)
+performs a separate clean build and the same guarded audit for pushed commits.
+See the [frozen upper contract and proof choices](docs/k1-upper-contract.md).
 
 ## Complete randomized lower theorem
 
@@ -128,6 +181,10 @@ flowchart BT
   R --> F
   U[Upper/Foundations] --> M
   U --> P
+  K[Upper/K1] --> U
+  K --> M
+  T[TightRate] --> K
+  T --> R
   A --> M
   P --> M
 ```
@@ -140,7 +197,9 @@ flowchart BT
 | `Lower/Gated/` | [Public entry](HeavyTailedNoise/Lower/Gated.lean) | Gated objective, stopped process, coupling, public parameters, and minimax assembly. |
 | `Lower/Randomized/` | [Complete lower entry](HeavyTailedNoise/Lower/Full.lean) | Unrestricted randomized baseline, actual stopped-posterior reflection symmetry, physical budgets and complete max-rate assembly. |
 | `Lower/Fradin/` | [Source contract](docs/fradin-contract.md) | Separate response-only construction for Fradin et al. v2, Theorem 3.1; complete native proof, independent reproduction and public axiom audits passed. |
-| `Upper/Foundations/` | [UpperMomentFoundations](HeavyTailedNoise/Upper/Foundations/UpperMomentFoundations.lean) | Fresh-batch coordinate moments and predictable unbiasedness. Batch-average moment decay, EMA analysis, and the final rate remain open. |
+| `Upper/Foundations/` | [UpperMomentFoundations](HeavyTailedNoise/Upper/Foundations/UpperMomentFoundations.lean), [NormalizedDescent](HeavyTailedNoise/Upper/Foundations/NormalizedDescent.lean) | Fresh-batch moments, clipping, predictable integration, vector orthogonality, tracker drift and normalized descent. |
+| `Upper/K1/` | [Public upper entry](HeavyTailedNoise/Upper/Full.lean), [Upper contract](docs/k1-upper-contract.md) | Original shared-batch EMA algorithm, actual filtration/kernel/error analysis, fixed-cap rate and dimension-uniform guarantee. |
+| Same-model matching | [TightRate](HeavyTailedNoise/TightRate.lean) | Direct composition with the complete randomized lower theorem in the common accuracy regime. |
 
 Reusable layers do not import a lower-bound construction. New constructions should share the model without importing another construction's internal proof path.
 
@@ -156,19 +215,26 @@ lake env lean scripts/CheckAxioms.lean
 
 [lean-toolchain](lean-toolchain) pins `leanprover/lean4:v4.34.0`. [lakefile.toml](lakefile.toml) and [lake-manifest.json](lake-manifest.json) pin mathlib to `5ed2965256430c3649e86755f9576b54eca72435`. Keep both files; `lake update` is a dependency change, not a reproduction step. The default Lake target builds the complete recursive proof library. [build-imac.sh](build-imac.sh) is an optional local cache driver using the same canonical package configuration.
 
-[CheckAxioms.lean](scripts/CheckAxioms.lean) prints 18 public complete-lower, gated and Fradin signatures and checks their transitive axiom dependencies against `propext`, `Classical.choice`, and `Quot.sound`. It fails on any other axiom, including a proof placeholder. The [CI workflow](.github/workflows/lean.yml) repeats the standard build and this audit with fixed action revisions.
+[CheckAxioms.lean](scripts/CheckAxioms.lean) prints 30 public complete-lower, upper, uniform/minimax, tight-rate, gated and Fradin signatures and checks their transitive axiom dependencies against `propext`, `Classical.choice`, and `Quot.sound`. It fails on any other axiom, including a proof placeholder. The [CI workflow](.github/workflows/lean.yml) repeats the standard build and this audit with fixed action revisions.
 
 ### Verification record
+
+Version 0.2.0 has 421 modules. Its local canonical default
+build, independent upper/matching entry import and 30-entry public
+signature/axiom audit passed on 30 September 2026. This round did not perform
+a fresh-directory 421-module rebuild or run hosted CI; those are separate
+reproduction and release gates. The earlier release record follows.
 
 The previous 195-module package passed complete primary and independent fresh-directory native builds, provenance audits and ten-entry public signature/axiom audits on 27 September 2026. The independent directory received no earlier project proof objects; dependency caches used exact locked revisions. The randomized lift is integrated into the unique 218-module source package. Its canonical default native build exited 0 against 223 unchanged frozen source/configuration/driver/audit inputs. The complete provenance check verified all 218 native module outputs and traces, exact setup ownership and permitted import paths, nine locked clean dependencies, and the fixed compiler. The expanded 18-entry public audit exited 0; every entry uses exactly `propext`, `Classical.choice`, and `Quot.sound`. A separate source importing only `HeavyTailedNoise.Lower.Full` checked the two final public entry types and the same three axioms. No independent clean 218-module rebuild was performed; the earlier independent build covers the previous 195-module package. After acceptance, all 218 generated project setup files were losslessly archived and restored with matching hashes before removing their expanded copies. The 18-entry public audit and separate Full-entry import then passed again with unchanged sources, proof objects and dependencies. Private build records and caches are outside the public package. Hosted reproduction uses the same pinned configuration; see [GitHub Actions](https://github.com/xiong-zx/heavy-tailed-noise-lean/actions) for the current remote build results.
 
 ## Proof notes, sources, and contributions
 
-- [Proof dependencies](docs/proof-dependencies.md) connect the complete randomized lower theorem, gated construction and separate original-response Fradin theorem.
+- [Proof dependencies](docs/proof-dependencies.md) connect the original shared-batch upper and matching corollaries, complete randomized lower theorem, gated construction and separate original-response Fradin theorem.
+- [Upper contract](docs/k1-upper-contract.md) fixes the manuscript version, algorithm, explicit constants and correlation-preserving kernel proof.
 - [Numerical proof repairs](docs/gated-proof-notes.md) explain the two invalid intermediate comparisons found during formalization and the exact replacement bounds.
 - [Fradin source contract](docs/fradin-contract.md) records the normalized checked theorem, its proof repair, and its algorithm and query-model restrictions.
 - [References](docs/references.md) distinguish source mathematics from formalized results.
 - [Contributing](docs/contributing.md) describes proof, attribution, and validation requirements.
 - [Project introduction](docs/index.md) is a short overview suitable for a personal research page.
 
-The package's original code and documentation are released under the [MIT license](LICENSE). Dependencies and cited papers retain their own licenses. Use [CITATION.cff](CITATION.cff) to cite this formalization, and cite the original mathematical sources when using their results.
+The package's original code and documentation use the [MIT license](LICENSE). Dependencies and cited papers retain their own licenses. Use [CITATION.cff](CITATION.cff) to cite the version you use, and cite the original mathematical sources when using their results. See the [v0.2.0 release notes](docs/release-v0.2.0.md) for the new verified statements and release gate.

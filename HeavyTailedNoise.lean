@@ -5,3 +5,5 @@ import HeavyTailedNoise.Analysis.Smoothness
 import HeavyTailedNoise.Upper.Foundations.UpperBatchProtocol
 import HeavyTailedNoise.Upper.Foundations.UpperMomentFoundations
 import HeavyTailedNoise.Upper.Foundations.UpperPredictableBatch
+import HeavyTailedNoise.Upper.Full
+import HeavyTailedNoise.TightRate

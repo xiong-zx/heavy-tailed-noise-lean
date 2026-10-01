@@ -6,27 +6,25 @@ authors:
   - family-names: "Xiong"
     given-names: "Zhixiao"
 repository-code: "https://github.com/xiong-zx/heavy-tailed-noise-lean"
-version: "0.1.0"
+version: "0.2.0"
 license: MIT
 abstract: >-
   Lean 4 formalization of the complete finite-q lower bound for arbitrary
-  randomized strict-K=1 algorithms, including the Bernoulli-chain baseline
-  and gated Haar term,
-  for stochastic optimization with bounded p-th central moments and
-  global same-seed q-increment bounds, and the first-slot-normalized
-  Fradin v2 Theorem 3.1 on the original response-only zero-respecting
-  shared-seed batch protocol. The library also contains reusable model,
-  analysis, probability, and upper-bound foundations. The integrated
-  218-module canonical native build, full provenance audit, 18-entry
-  public signature and axiom audit, and standalone full-entry import
-  check passed locally on 27 September 2026. The complete lower bound
-  retains an absolute relative accuracy condition and fixed natural
-  response budgets; no complete upper-rate or infinite-q theorem is claimed.
+  randomized strict-K=1 algorithms and the original strict-K=1 shared-batch
+  exponential-memory upper algorithm in the same gradient-only model.
+  Under the common absolute accuracy condition, a verified corollary gives
+  matching rates for the same dimension-uniform minimax complexity. The
+  library also verifies the separate first-slot-normalized Fradin v2
+  Theorem 3.1 in its zero-respecting shared-seed batch model. The local
+  421-module canonical build, independent public-entry import, and 30-entry
+  public signature and axiom audit passed on 30 September 2026. The
+  package does not claim an infinite-q theorem.
 keywords:
   - "Lean 4"
   - "stochastic optimization"
   - "heavy-tailed noise"
   - "complexity lower bounds"
+  - "complexity upper bounds"
   - "formal verification"
 references:
   - type: article

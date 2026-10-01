@@ -5,6 +5,59 @@ import. The [library overview](../README.md) gives the exact public statements
 and verification record. Each construction discharges its own oracle and
 probability obligations before the public theorem is assembled.
 
+## Original shared-batch strict-K=1 upper bound
+
+The public upper entry is `HeavyTailedNoise.Upper.Full`; `HeavyTailedNoise.TightRate`
+connects it directly to `Lower.Full`. All responses in a runtime batch are at
+the pre-batch point, from different independent fresh seeds. Each response
+feeds every scale, so the full same-seed band sum is retained in the kernel
+before taking its square or variance. The filtration is taken before the
+whole batch, including the response later used to update the tracker.
+
+```mermaid
+flowchart TD
+  A[Literal logged algorithm and exact response cap] --> P[Actual path and pre-batch product law]
+  P --> T[Adaptive coarse tracker and residual p moment]
+  P --> K[Whole same-seed kernel and cross-batch orthogonality]
+  T --> K
+  T --> B[Terminal clipping bias]
+  T --> D[Source-mean drift and EMA lag]
+  P --> I[Actual independent initialization and its variance]
+  K --> E[Actual four-error expected average]
+  B --> E
+  D --> E
+  I --> E
+  E --> R[Normalized descent and uniform random output risk]
+  C[Physical ceilings and explicit p q constants] --> E
+  C --> N[Fixed response-cap rate]
+  R --> U[No-extra-premise upper theorem]
+  N --> U
+  U --> V[Same fixed cap across dimensions and oracles]
+  V --> M[Original unrestricted minimax upper bound]
+  L[Complete randomized Lower.Full] --> F[Same minimax two-sided tight rate]
+  M --> F
+  S[Factor-two rate-shape comparison] --> F
+```
+
+| Obligation | Main source entry |
+| --- | --- |
+| Original state updates, gradient-only decisions and exact count | [Algorithm](../HeavyTailedNoise/Upper/K1/Algorithm.lean), [PhysicalParameters](../HeavyTailedNoise/Upper/K1/PhysicalParameters.lean) |
+| Whole-batch pre-response history and fresh product-law reindexing | [BatchPastMeasurability](../HeavyTailedNoise/Upper/K1/BatchPastMeasurability.lean), [BatchSeedProduct](../HeavyTailedNoise/Upper/K1/BatchSeedProduct.lean), [BatchSeedReindex](../HeavyTailedNoise/Upper/K1/BatchSeedReindex.lean) |
+| Actual tracker moment and residual p moment | [CoarseTrackerPaperScheduleMoment](../HeavyTailedNoise/Upper/K1/CoarseTrackerPaperScheduleMoment.lean), [ResidualPhysicalMoment](../HeavyTailedNoise/Upper/K1/ResidualPhysicalMoment.lean) |
+| Within-seed kernel bound, actual centering and noise budget | [KernelPhiResidualMoment](../HeavyTailedNoise/Upper/K1/KernelPhiResidualMoment.lean), [ActualEstimatorKernelIdentity](../HeavyTailedNoise/Upper/K1/ActualEstimatorKernelIdentity.lean), [RuntimeNoiseNorm](../HeavyTailedNoise/Upper/K1/RuntimeNoiseNorm.lean) |
+| Initialization, source-mean lag and terminal bias | [InitialMemoryNorm](../HeavyTailedNoise/Upper/K1/InitialMemoryNorm.lean), [EMADriftSeed](../HeavyTailedNoise/Upper/K1/EMADriftSeed.lean), [TerminalClipBiasExpectation](../HeavyTailedNoise/Upper/K1/TerminalClipBiasExpectation.lean) |
+| Complete actual error average and risk conclusion | [EstimatorAverageBound](../HeavyTailedNoise/Upper/K1/EstimatorAverageBound.lean), [Main](../HeavyTailedNoise/Upper/K1/Main.lean) |
+| Explicit constants and fixed response-cap rate | [ConvergenceConstants](../HeavyTailedNoise/Upper/K1/ConvergenceConstants.lean), [BudgetRateMax](../HeavyTailedNoise/Upper/K1/BudgetRateMax.lean) |
+| Literal common minimax upper and lower statements | [UniformGuarantee](../HeavyTailedNoise/Upper/K1/UniformGuarantee.lean), [RateComparison](../HeavyTailedNoise/Upper/K1/RateComparison.lean), [TightRate](../HeavyTailedNoise/TightRate.lean) |
+
+The intermediate risk bridge's estimator-error premise is discharged by
+`EstimatorAverageBound` in `Main`. The private-index universe lifting proves
+exact risk equality. The matching proof calls the complete randomized lower
+theorem and the original uniform upper guarantee; it does not use a
+zero-respecting theorem. The common accuracy regime is A≥10,752,000.
+See the [upper contract](k1-upper-contract.md) for the frozen manuscript,
+legal constants and conservative kernel proof choice.
+
 ## Complete randomized strict-K=1 lower bound
 
 The main public entry is `HeavyTailedNoise.Lower.Full`. Its response-only
